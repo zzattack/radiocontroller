@@ -1,0 +1,454 @@
+[p PRO_MODE GLOBOPT AUTOSTATIC LFSROK SPACEOPT ]
+[d version 1.1 ]
+[d edition pro ]
+[d chip 18F4550 ]
+"58 configuration_bits.c
+[e E4983 SystemState `uc
+SystemOff 0
+SystemBoot 1
+SystemOn 2
+SystemShutdownWait 3
+SystemShutdown 4
+]
+[e E4989 ShutdownPhase `uc
+contactOff 0
+lockInactive 1
+lockActive 2
+]
+[e E4993 PredictState `uc
+Idle 0
+ContactRecent 1
+ContactNotRecent 2
+Starting 3
+]
+"13 interrupts.c
+[v F5026 `(v  1 t 0 ]
+"108
+[e E4983 SystemState `uc
+SystemOff 0
+SystemBoot 1
+SystemOn 2
+SystemShutdownWait 3
+SystemShutdown 4
+]
+[e E4989 ShutdownPhase `uc
+contactOff 0
+lockInactive 1
+lockActive 2
+]
+[e E4993 PredictState `uc
+Idle 0
+ContactRecent 1
+ContactNotRecent 2
+Starting 3
+]
+"26 main.c
+[e E4983 SystemState `uc
+SystemOff 0
+SystemBoot 1
+SystemOn 2
+SystemShutdownWait 3
+SystemShutdown 4
+]
+[e E4989 ShutdownPhase `uc
+contactOff 0
+lockInactive 1
+lockActive 2
+]
+[e E4993 PredictState `uc
+Idle 0
+ContactRecent 1
+ContactNotRecent 2
+Starting 3
+]
+"3093 C:\PIC\PICC-18\9.80\include\pic18f4550.h
+"5 ../../common/abdiv.c
+[v ___abdiv `(c  1 e 1 0 ]
+"5 C:\PIC\PICC-18\9.80\sources\abmod.c
+[v ___abmod `(c  1 e 1 0 ]
+"32 C:\PIC\PICC-18\9.80\sources\abtofl.c
+[v ___abtofl `(d  1 e 3 0 ]
+"34 C:\PIC\PICC-18\9.80\sources\abtoft.c
+[v ___abtoft `(f  1 e 3 0 ]
+"10 C:\PIC\PICC-18\9.80\sources\aldiv.c
+[v ___aldiv `(l  1 e 4 0 ]
+"10 C:\PIC\PICC-18\9.80\sources\almod.c
+[v ___almod `(l  1 e 4 0 ]
+"37 C:\PIC\PICC-18\9.80\sources\altofl.c
+[v ___altofl `(d  1 e 3 0 ]
+"43 C:\PIC\PICC-18\9.80\sources\altoft.c
+[v ___altoft `(f  1 e 3 0 ]
+"5 C:\PIC\PICC-18\9.80\sources\asfladd.c
+[v ___asfladd `(d  1 e 3 0 ]
+"5 C:\PIC\PICC-18\9.80\sources\asfldiv.c
+[v ___asfldiv `(d  1 e 3 0 ]
+"5 C:\PIC\PICC-18\9.80\sources\asflmul.c
+[v ___asflmul `(d  1 e 3 0 ]
+"5 C:\PIC\PICC-18\9.80\sources\asflsub.c
+[v ___asflsub `(d  1 e 3 0 ]
+"5 C:\PIC\PICC-18\9.80\sources\asftadd.c
+[v ___asftadd `(f  1 e 3 0 ]
+"5 C:\PIC\PICC-18\9.80\sources\asftdiv.c
+[v ___asftdiv `(f  1 e 3 0 ]
+"5 C:\PIC\PICC-18\9.80\sources\asftmul.c
+[v ___asftmul `(f  1 e 3 0 ]
+"5 C:\PIC\PICC-18\9.80\sources\asftsub.c
+[v ___asftsub `(f  1 e 3 0 ]
+"5 C:\PIC\PICC-18\9.80\sources\aslmul.c
+[v ___aslmul `(ul  1 e 4 0 ]
+"10 C:\PIC\PICC-18\9.80\sources\atdiv.c
+[v ___atdiv `(m  1 e 3 0 ]
+"10 C:\PIC\PICC-18\9.80\sources\atmod.c
+[v ___atmod `(m  1 e 3 0 ]
+"38 C:\PIC\PICC-18\9.80\sources\attofl.c
+[v ___attofl `(d  1 e 3 0 ]
+"38 C:\PIC\PICC-18\9.80\sources\attoft.c
+[v ___attoft `(f  1 e 3 0 ]
+"10 C:\PIC\PICC-18\9.80\sources\awdiv.c
+[v ___awdiv `(i  1 e 2 0 ]
+"10 C:\PIC\PICC-18\9.80\sources\awmod.c
+[v ___awmod `(i  1 e 2 0 ]
+"32 C:\PIC\PICC-18\9.80\sources\awtofl.c
+[v ___awtofl `(d  1 e 3 0 ]
+"33 C:\PIC\PICC-18\9.80\sources\awtoft.c
+[v ___awtoft `(f  1 e 3 0 ]
+"3 C:\PIC\PICC-18\9.80\sources\bmul.c
+[v ___bmul `(uc  1 e 1 0 ]
+"64 C:\PIC\PICC-18\9.80\sources\double.c
+[v ___flpack `(d  1 e 3 0 ]
+"89 C:\PIC\PICC-18\9.80\sources\fladd.c
+[v ___fladd `(d  1 e 3 0 ]
+"50 C:\PIC\PICC-18\9.80\sources\fldiv.c
+[v ___fldiv `(d  1 e 3 0 ]
+"5 C:\PIC\PICC-18\9.80\sources\flge.c
+[v ___flge `(b  1 e 0 0 ]
+"51 C:\PIC\PICC-18\9.80\sources\flmul.c
+[v ___flmul `(d  1 e 3 0 ]
+"16 C:\PIC\PICC-18\9.80\sources\flneg.c
+[v ___flneg `(d  1 e 3 0 ]
+"63 C:\PIC\PICC-18\9.80\sources\float.c
+[v ___ftpack `(f  1 e 3 0 ]
+"22 C:\PIC\PICC-18\9.80\sources\flsub.c
+[v ___flsub `(d  1 e 3 0 ]
+"44 C:\PIC\PICC-18\9.80\sources\fltol.c
+[v ___fltol `(l  1 e 4 0 ]
+"87 C:\PIC\PICC-18\9.80\sources\ftadd.c
+[v ___ftadd `(f  1 e 3 0 ]
+"50 C:\PIC\PICC-18\9.80\sources\ftdiv.c
+[v ___ftdiv `(f  1 e 3 0 ]
+"5 C:\PIC\PICC-18\9.80\sources\ftge.c
+[v ___ftge `(b  1 e 0 0 ]
+"52 C:\PIC\PICC-18\9.80\sources\ftmul.c
+[v ___ftmul `(f  1 e 3 0 ]
+"16 C:\PIC\PICC-18\9.80\sources\ftneg.c
+[v ___ftneg `(f  1 e 3 0 ]
+"22 C:\PIC\PICC-18\9.80\sources\ftsub.c
+[v ___ftsub `(f  1 e 3 0 ]
+"45 C:\PIC\PICC-18\9.80\sources\fttol.c
+[v ___fttol `(l  1 e 4 0 ]
+"5 C:\PIC\PICC-18\9.80\sources\lbdiv.c
+[v ___lbdiv `(uc  1 e 1 0 ]
+"5 C:\PIC\PICC-18\9.80\sources\lbmod.c
+[v ___lbmod `(uc  1 e 1 0 ]
+"28 C:\PIC\PICC-18\9.80\sources\lbtofl.c
+[v ___lbtofl `(d  1 e 3 0 ]
+"28 C:\PIC\PICC-18\9.80\sources\lbtoft.c
+[v ___lbtoft `(f  1 e 3 0 ]
+"10 C:\PIC\PICC-18\9.80\sources\lldiv.c
+[v ___lldiv `(ul  1 e 4 0 ]
+"10 C:\PIC\PICC-18\9.80\sources\llmod.c
+[v ___llmod `(ul  1 e 4 0 ]
+"31 C:\PIC\PICC-18\9.80\sources\lltofl.c
+[v ___lltofl `(d  1 e 3 0 ]
+"36 C:\PIC\PICC-18\9.80\sources\lltoft.c
+[v ___lltoft `(f  1 e 3 0 ]
+"3 C:\PIC\PICC-18\9.80\sources\lmul.c
+[v ___lmul `(ul  1 e 4 0 ]
+"10 C:\PIC\PICC-18\9.80\sources\ltdiv.c
+[v ___ltdiv `(um  1 e 3 0 ]
+"10 C:\PIC\PICC-18\9.80\sources\ltmod.c
+[v ___ltmod `(um  1 e 3 0 ]
+"31 C:\PIC\PICC-18\9.80\sources\lttofl.c
+[v ___lttofl `(d  1 e 3 0 ]
+"31 C:\PIC\PICC-18\9.80\sources\lttoft.c
+[v ___lttoft `(f  1 e 3 0 ]
+"10 C:\PIC\PICC-18\9.80\sources\lwdiv.c
+[v ___lwdiv `(ui  1 e 2 0 ]
+"10 C:\PIC\PICC-18\9.80\sources\lwmod.c
+[v ___lwmod `(ui  1 e 2 0 ]
+"29 C:\PIC\PICC-18\9.80\sources\lwtofl.c
+[v ___lwtofl `(d  1 e 3 0 ]
+"29 C:\PIC\PICC-18\9.80\sources\lwtoft.c
+[v ___lwtoft `(f  1 e 3 0 ]
+"3 C:\PIC\PICC-18\9.80\sources\tmul.c
+[v ___tmul `(um  1 e 3 0 ]
+"3 C:\PIC\PICC-18\9.80\sources\wmul.c
+[v ___wmul `(ui  1 e 2 0 ]
+"13 interrupts.c
+[v _isr `I(v  1 e 0 0 ]
+"13 main.c
+[v _main `(uc  1 e 1 0 ]
+"15 user.c
+[v _initPIC `(v  1 e 0 0 ]
+"58
+[v _checkAnalog `(v  1 e 0 0 ]
+"97
+[v _checkTimer1 `(uc  1 e 1 0 ]
+"119
+[v _lastKnipperRecent `(uc  1 e 1 0 ]
+"124
+[v _checkStateMachine `(v  1 e 0 0 ]
+"295
+[v _predictiveStartUpdate `(v  1 e 0 0 ]
+"339
+[v _updatePowerRelais `(v  1 e 0 0 ]
+"1020 C:\PIC\PICC-18\9.80\include\pic18f4550.h
+[v _PORTA `Vuc  1 e 1 @3968 ]
+"1072
+[v _PORTB `Vuc  1 e 1 @3969 ]
+"1107
+[v _PORTC `Vuc  1 e 1 @3970 ]
+"1161
+[v _PORTD `Vuc  1 e 1 @3971 ]
+"1197
+[v _PORTE `Vuc  1 e 1 @3972 ]
+"1565
+[v _TRISA `Vuc  1 e 1 @3986 ]
+"1624
+[v _TRISB `Vuc  1 e 1 @3987 ]
+"1687
+[v _TRISC `Vuc  1 e 1 @3988 ]
+"1750
+[v _TRISD `Vuc  1 e 1 @3989 ]
+"2098
+[v _RCSTA `Vuc  1 e 1 @4011 ]
+"2151
+[v _TXSTA `Vuc  1 e 1 @4012 ]
+"2250
+[v _TXREG `Vuc  1 e 1 @4013 ]
+"2296
+[v _SPBRG `Vuc  1 e 1 @4015 ]
+"2562
+[v _BAUDCON `Vuc  1 e 1 @4024 ]
+"2684
+[v _CCP1CON `Vuc  1 e 1 @4029 ]
+"2743
+[v _CCPR1L `Vuc  1 e 1 @4030 ]
+"2767
+[v _ADCON2 `Vuc  1 e 1 @4032 ]
+"2790
+[v _ADCON1 `Vuc  1 e 1 @4033 ]
+"2823
+[v _ADCON0 `Vuc  1 e 1 @4034 ]
+"2902
+[v _ADRESH `Vuc  1 e 1 @4036 ]
+"3093
+[v _T2CON `Vuc  1 e 1 @4042 ]
+"3123
+[v _PR2 `Vuc  1 e 1 @4043 ]
+"3158
+[v _T1CON `Vuc  1 e 1 @4045 ]
+"3207
+[v _TMR1L `Vuc  1 e 1 @4046 ]
+"3219
+[v _TMR1H `Vuc  1 e 1 @4047 ]
+"3397
+[v _T0CON `Vuc  1 e 1 @4053 ]
+"3431
+[v _TMR0L `Vuc  1 e 1 @4054 ]
+"3443
+[v _TMR0H `Vuc  1 e 1 @4055 ]
+[s S167 . 1 `uc 1 RBIF 1 0 :1:0 
+`uc 1 INT0IF 1 0 :1:1 
+`uc 1 TMR0IF 1 0 :1:2 
+`uc 1 RBIE 1 0 :1:3 
+`uc 1 INT0IE 1 0 :1:4 
+`uc 1 TMR0IE 1 0 :1:5 
+`uc 1 PEIE_GIEL 1 0 :1:6 
+`uc 1 GIE_GIEH 1 0 :1:7 
+]
+"3917
+[s S176 . 1 `uc 1 RBIF 1 0 :1:0 
+`uc 1 INT0IF 1 0 :1:1 
+`uc 1 TMR0IF 1 0 :1:2 
+`uc 1 RBIE 1 0 :1:3 
+`uc 1 INT0IE 1 0 :1:4 
+`uc 1 TMR0IE 1 0 :1:5 
+`uc 1 PEIE 1 0 :1:6 
+`uc 1 GIE 1 0 :1:7 
+]
+[s S185 . 1 `uc 1 RBIF 1 0 :1:0 
+`uc 1 INT0IF 1 0 :1:1 
+`uc 1 TMR0IF 1 0 :1:2 
+`uc 1 RBIE 1 0 :1:3 
+`uc 1 INT0IE 1 0 :1:4 
+`uc 1 TMR0IE 1 0 :1:5 
+`uc 1 GIEL 1 0 :1:6 
+`uc 1 GIEH 1 0 :1:7 
+]
+[s S203 . 1 `uc 1 . 1 0 :1:0 
+`uc 1 INT0F 1 0 :1:1 
+`uc 1 T0IF 1 0 :1:2 
+`uc 1 . 1 0 :1:3 
+`uc 1 INT0E 1 0 :1:4 
+`uc 1 T0IE 1 0 :1:5 
+`uc 1 PEIE 1 0 :1:6 
+`uc 1 GIE 1 0 :1:7 
+]
+[s S212 . 1 `uc 1 . 1 0 :6:0 
+`uc 1 GIEL 1 0 :1:6 
+`uc 1 GIEH 1 0 :1:7 
+]
+[u S216 . 1 `S167 1 . 1 0 `S176 1 . 1 0 `S185 1 . 1 0 `S167 1 . 1 0 `S203 1 . 1 0 `S212 1 . 1 0 ]
+[v _INTCONbits `VS216  1 e 1 @4082 ]
+"4726
+[v _GO_DONE `Vb  1 e 0 @32273 ]
+"4856
+[v _LATB0 `Vb  1 e 0 @31824 ]
+"4860
+[v _LATB2 `Vb  1 e 0 @31826 ]
+"4872
+[v _LATC0 `Vb  1 e 0 @31832 ]
+"4874
+[v _LATC1 `Vb  1 e 0 @31833 ]
+"4882
+[v _LATD0 `Vb  1 e 0 @31840 ]
+"4896
+[v _LATD7 `Vb  1 e 0 @31847 ]
+"5146
+[v _RA4 `Vb  1 e 0 @31748 ]
+"5148
+[v _RA5 `Vb  1 e 0 @31749 ]
+"5216
+[v _RD1 `Vb  1 e 0 @31769 ]
+"5238
+[v _RE0 `Vb  1 e 0 @31776 ]
+"5240
+[v _RE1 `Vb  1 e 0 @31777 ]
+"5242
+[v _RE2 `Vb  1 e 0 @31778 ]
+"5460
+[v _TMR0IE `Vb  1 e 0 @32661 ]
+"5462
+[v _TMR0IF `Vb  1 e 0 @32658 ]
+"5472
+[v _TMR1IF `Vb  1 e 0 @31984 ]
+"5612
+[v _TXIF `Vb  1 e 0 @31988 ]
+"22 globals.h
+[v _PWR_BUTTON `C[163]uc  1 e 163 0 ]
+"26
+[v _REP_BUTTON `C[27]uc  1 e 27 0 ]
+"30
+[v _VOL_UP_BUTTON `C[162]uc  1 e 162 0 ]
+"34
+[v _VOL_DOWN_BUTTON `C[162]uc  1 e 162 0 ]
+"49
+[v _time250Hz `uc  1 e 1 0 ]
+"52
+[v _analogState `uc  1 e 1 0 ]
+"56
+[v _analog4Value `uc  1 e 1 0 ]
+"59
+[v _irRecState `ui  1 e 2 0 ]
+"60
+[v _irRecBytes `[400]uc  1 e 400 0 ]
+"61
+[v _irLastRecByte `ui  1 e 2 0 ]
+"64
+[v _irSendBitIndex `ui  1 e 2 0 ]
+"65
+[v _irSendMessageIndex `uc  1 e 1 0 ]
+"68
+[v _txIndex `ui  1 e 2 0 ]
+"71
+[v _state `uc  1 e 1 0 ]
+"72
+[v _stateTimer `ui  1 e 2 0 ]
+"73
+[v _noKnippers `ui  1 e 2 0 ]
+"74
+[v _shutdownPhase `uc  1 e 1 0 ]
+"76
+[v _predictState `uc  1 e 1 0 ]
+"77
+[v _predictStateTimer `ui  1 e 2 0 ]
+"78
+[v _contactOffCounter `uc  1 e 1 0 ]
+"79
+[v _startOffCounter `uc  1 e 1 0 ]
+"80
+[v _pumpOnCounter `ui  1 e 2 0 ]
+"13 main.c
+[v _main `(uc  1 e 1 0 ]
+{
+"26
+} 0
+"15 user.c
+[v _initPIC `(v  1 e 0 0 ]
+{
+"55
+} 0
+"97
+[v _checkTimer1 `(uc  1 e 1 0 ]
+{
+"117
+} 0
+"58
+[v _checkAnalog `(v  1 e 0 0 ]
+{
+"94
+} 0
+"295
+[v _predictiveStartUpdate `(v  1 e 0 0 ]
+{
+"300
+[v predictiveStartUpdate@RECENTNESS_DELAY `Cui  1 a 2 20 ]
+"337
+} 0
+"339
+[v _updatePowerRelais `(v  1 e 0 0 ]
+{
+"364
+} 0
+"124
+[v _checkStateMachine `(v  1 e 0 0 ]
+{
+"246
+[v checkStateMachine@IDX_POWEROFF_RELAIS `Ci  1 a 2 28 ]
+"245
+[v checkStateMachine@IDX_VOL_DOWN_END `Ci  1 a 2 26 ]
+"244
+[v checkStateMachine@IDX_PWR_BUTTON_TX_END `Ci  1 a 2 24 ]
+"152
+[v checkStateMachine@IDX_VOLUP_BUTTON_TX_END `Ci  1 a 2 22 ]
+"151
+[v checkStateMachine@IDX_VOLUP_BUTTON_TX `Ci  1 a 2 20 ]
+"153
+[v checkStateMachine@IDX_TIMEOUT `Ci  1 a 2 18 ]
+"293
+} 0
+"119
+[v _lastKnipperRecent `(uc  1 e 1 0 ]
+{
+"121
+} 0
+"13 interrupts.c
+[v _isr `I(v  1 e 0 0 ]
+{
+"56
+[v isr@i `ui  1 a 2 15 ]
+"24
+[v isr@byteNr `ui  1 a 2 13 ]
+"25
+[v isr@bitNr `uc  1 a 1 8 ]
+"66
+[v isr@maxIndex `ui  1 a 2 10 ]
+"62
+[v isr@byteNr_73 `uc  1 a 1 17 ]
+"65
+[v isr@byte `uc  1 a 1 12 ]
+"63
+[v isr@bitNr_74 `uc  1 a 1 9 ]
+"108
+} 0
