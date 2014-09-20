@@ -13,3 +13,4 @@ RadioController.X/funclist
 /RadioController.X/Makefile
 
 /RadioController.X/*.hex
+/RadioController.X/basic.h

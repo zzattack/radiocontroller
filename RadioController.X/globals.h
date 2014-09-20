@@ -39,8 +39,10 @@ const uint8_t VOL_DOWN_BUTTON[VOL_DOWN_BUTTON_SIZE] = {0b11111110, 0b11111111, 0
 
 enum SystemState { SystemOff, SystemBoot, SystemOn, SystemShutdownWait, SystemShutdown };
 enum ShutdownPhase { contactOff, lockInactive, lockActive };
+enum PredictState { Idle, ContactRecent, ContactNotRecent, Starting };
 
 #define ChangeState(x) do { state = x; stateTimer = 0; } while (0)
+#define ChangePredictState(x) do { predictState = x; predictStateTimer = 0; } while (0)
 #define testbit(var, bit)  ((var) & (1 << (bit)))
 
 /* Timing */
@@ -64,10 +66,15 @@ uint8_t irSendMessageIndex = 0;
 /* TX */
 uint16_t txIndex = 0;
 
-/* State Machine */
+/* State Machines */
 uint8_t state = SystemOff;
 uint16_t stateTimer = 0;
-uint8_t shutdownPhase = contactOff;
 uint16_t noKnippers = 0;
+uint8_t shutdownPhase = contactOff;
+
+uint8_t predictState = Idle;
+uint16_t predictStateTimer = 0;
+uint16_t contactOffCounter = 0;
+bool predictiveStart = false;
 
 #endif	/* GLOBALS_H */

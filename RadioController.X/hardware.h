@@ -23,13 +23,23 @@
 
 #define RELAIS1 LATB0
 #define RELAIS2 LATD7
+#define RELAIS3 ERROR // R3 switches accu/bat
+#define RELAIS4 ERROR // R4 switches accu/nothing
+#define R3ACCU = 0
+#define R3BAT = 1
+#define R4ACCU = 0
+#define R4OFF = 1
 
 /* Input Names */
 #define TSOP RD1
 
-#define Contact DIGITAL1
-#define Knipper DIGITAL3
-#define Lock DIGITAL5
+#define Accessory !(DIGITAL1)
+#define Knipper !(DIGITAL3)
+#define Lock (!(DIGITAL5) && !Contact)
+#define Contact !(ERROR)
+#define Start !(ERROR)
+#define Accu !(ERROR)
+#define Pump !(ERROR)
 
 /* Output Names */
 #define CCP1 RC2
@@ -41,7 +51,7 @@
 #define IR_PWM LATC2
 #define IR_EN LATC1
 
-#define ContactRelais RELAIS1
+#define AccessoryRelais RELAIS1
 
 
 #endif	/* HARDWARE_H */
