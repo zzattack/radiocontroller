@@ -36,12 +36,15 @@
 /* Input Names */
 #define TSOP RD1
 
-#define Accessory !(DIGITAL1)
+// accessory is implied by contact, the || serves as a extra check in case the accessory wire fucks up again
+#define Accessory (!(DIGITAL1) || Contact)
+
 #define Contact !(DIGITAL2)
 #define Knipper !(DIGITAL3)
 #define Start !(DIGITAL4)
-#define Lock (!(DIGITAL5) && !Contact)
+#define LockReal (!(DIGITAL5) && !Contact)
 #define Pump (analog4Value > 127)
+#define Brake LATD2
 
 /* Output Names */
 #define CCP1 RC2

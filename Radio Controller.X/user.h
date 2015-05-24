@@ -15,4 +15,5 @@ bool checkTimer1();
 
 void checkStateMachine();
 void predictiveStartUpdate();
+void lockFix();
 void updatePowerRelais();

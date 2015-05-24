@@ -71,6 +71,7 @@ uint16_t txIndex = 0;
 uint8_t state = SystemOff;
 uint16_t stateTimer = 0;
 uint16_t noKnippers = 65535;
+bool knipperedWhileWait = 0;
 uint8_t shutdownPhase = contactOff;
 
 uint8_t predictState = Idle;
@@ -78,5 +79,10 @@ uint16_t predictStateTimer = 0;
 uint8_t contactOffCounter = 255;
 uint8_t startOffCounter = 255;
 uint16_t pumpOnCounter = 0;
+
+uint16_t timeSinceUnlock = 65535;
+uint16_t timeUnlockFakeRemaining = 65535;
+bool Lock = 0;
+bool LockRealPrev = 0;
 
 #endif	/* GLOBALS_H */

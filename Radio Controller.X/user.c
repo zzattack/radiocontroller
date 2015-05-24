@@ -18,7 +18,7 @@ void initPIC()
     TRISA = 0b11111111;
     TRISB = 0b11111010;
     TRISC = 0b11111000;
-    TRISD = 0b01111110;
+    TRISD = 0b01111010;
 
     /* Initialize peripherals */
 
@@ -106,8 +106,9 @@ bool checkTimer1()
         updatePowerRelais();
         
         time250Hz++;
-        if (time250Hz == 20) {
+        if (time250Hz == 20) { // @ 12.5Hz
             time250Hz = 0;
+            lockFix();
             checkStateMachine();
         }
 
@@ -127,6 +128,7 @@ void checkStateMachine()
             LED_RED = 1;
             LED_GREEN = 1;
             AccessoryRelais = 0;
+            Brake = 0;
             
             // when accessory is enabled, always go to boot state
             if (Accessory)
@@ -143,21 +145,22 @@ void checkStateMachine()
             LED_GREEN = 0;
             AccessoryRelais = 1;
 
-            // @ time == 39: tx PWR_BUTTON_MSG
-            // @ time in 240-239: tx VOL_UP_BUTTON_MSG
+            // @ time == 43: tx PWR_BUTTON_MSG
+            // @ time in 220-257: tx VOL_UP_BUTTON_MSG
             // @ time >= 2160: goto SystemShutdown
 
-            const int IDX_PWR_BUTTON_TX = 39;
-            const int IDX_VOLUP_BUTTON_TX = 200;
-            const int IDX_VOLUP_BUTTON_TX_END = 237;
-            const int IDX_TIMEOUT = 2160;
+            const int IDX_PWR_BUTTON_TX = 43;
+            const int IDX_VOLUP_BUTTON_TX = 220;
+            const int IDX_VOLUP_BUTTON_TX_END = IDX_VOLUP_BUTTON_TX + 37;
+            const int IDX_TIMEOUT = 1500; // 2 mins
 
-            // if lock is activated (can only be measured when contact is off)
-            // also check this was due to a knipper and not due to cars' internal timeout/relock
-            if (Lock && lastKnipperRecent()) {
+            Brake = stateTimer > IDX_VOLUP_BUTTON_TX_END ? 1 : 0;
 
-                // if we haven't been in this state for some time, we may not need
-                // to close the screen or lower the volume
+            // when activating the lock, jump to the proper phase of
+            // shutting donw
+            if (Lock) {
+                // if we haven't been in this state for some time,
+                // we may not need to lower the volume
                 
                 if (stateTimer < IDX_PWR_BUTTON_TX)
                     // haven't powered up yet, just disconnect relais
@@ -177,7 +180,7 @@ void checkStateMachine()
 
             } else if (stateTimer > IDX_VOLUP_BUTTON_TX) {
                 if (stateTimer <= IDX_VOLUP_BUTTON_TX_END) {
-                    // only every 4th tick
+                    // only every 2nd tick
                     if (testbit(stateTimer, 0)) {
                         irSendMessageIndex = VOL_UP_BUTTON_MSG;
                     }
@@ -200,9 +203,11 @@ void checkStateMachine()
             LED_RED = 0;
             LED_GREEN = 0;
             AccessoryRelais = 1;
+            Brake = 1;
 
             if (!Accessory) {
                 shutdownPhase = contactOff;
+                knipperedWhileWait = false;
                 ChangeState(SystemShutdownWait);
             }
             break;
@@ -211,9 +216,12 @@ void checkStateMachine()
             LED_RED = 0;
             LED_GREEN = 1;
             AccessoryRelais = 1;
+            Brake = 1;
+
+            knipperedWhileWait |= Knipper;
 
             switch (shutdownPhase) {
-                // shutdownPhase is initially always accessoryOff
+                // shutdownPhase is initially always contactOff
                 case contactOff:
                     // Lock signal was active while contact was on, but
                     // quickly deactivates after contactOff
@@ -222,14 +230,15 @@ void checkStateMachine()
                     break;
 
                 case lockInactive:
-                    // after manually activating the lock the car is actually locked
-                    if (Lock && lastKnipperRecent())
+                    if (Lock && knipperedWhileWait)
                         shutdownPhase = lockActive;
                     break;
             }
 
             if (Accessory)
                 ChangeState(SystemOn);
+
+            // after locking the car or 2 minute timeout
             else if (stateTimer > 1440 || shutdownPhase == lockActive)
                 ChangeState(SystemShutdown);
 
@@ -239,6 +248,7 @@ void checkStateMachine()
             LED_RED = 0;
             LED_GREEN = 1;
             AccessoryRelais = 1;
+            Brake = 1;
 
             const int IDX_VOL_DOWN_END = 80;
             const int IDX_PWR_BUTTON_TX = IDX_VOL_DOWN_END + 2;
@@ -288,7 +298,6 @@ void checkStateMachine()
     
     if (stateTimer < 65535)
         stateTimer++;
-
 }
 
 void predictiveStartUpdate() {
@@ -333,6 +342,48 @@ void predictiveStartUpdate() {
 
     if (!Pump) pumpOnCounter = 0;
     else if (pumpOnCounter < 65535) pumpOnCounter++;
+}
+
+void lockFix() {
+    // sometimes right after unlocking, the car re-locks itself,
+    // causing the startup sequence to never happen.
+    // when the instant re-lock is detected, we force the lock
+    // to be ignored for 120 seconds
+
+    if (!LockReal && LockRealPrev) { // just unlocked
+        timeSinceUnlock = 0;
+        Lock = false;
+    }
+    else if (LockReal) {
+        if (!LockRealPrev) { // just locked
+            // if re-locked within a 1.5s of unlocking, "ignore" for 60s
+            if (timeSinceUnlock < 16)
+                timeUnlockFakeRemaining = 1440; // 2 min
+            else
+                timeUnlockFakeRemaining = 0;
+        }
+        if (timeUnlockFakeRemaining > 0) {
+            if (Knipper && timeUnlockFakeRemaining < 1420) {
+                // knipper during lock fake means either 1) the doors are unlocked
+                // again, after which !LockReal is in sync again (picked up above)
+                // or 2) the doors are now actually locked (picked up here) so
+                // we should stop faking the unlock
+                timeUnlockFakeRemaining = 0;
+                Lock = true;
+            }
+            else {
+                timeUnlockFakeRemaining--;
+                Lock = false;
+            }
+        }
+        else
+            Lock = true;
+    }
+
+    LockRealPrev = LockReal;
+
+    if (timeSinceUnlock < 65535)
+        timeSinceUnlock++;
 }
 
 void updatePowerRelais() {    
