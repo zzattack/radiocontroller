@@ -1,0 +1,293 @@
+ RadioController.X/globals.h  |  11 ++++-
+ RadioController.X/hardware.h |  18 ++++++--
+ RadioController.X/user.c     | 108 ++++++++++++++++++++++++++++++++++---------
+ 3 files changed, 109 insertions(+), 28 deletions(-)
+
+diff --git a/RadioController.X/globals.h b/RadioController.X/globals.h
+index ad4e3d1..68c885f 100644
+--- a/RadioController.X/globals.h
++++ b/RadioController.X/globals.h
+@@ -39,8 +39,10 @@ const uint8_t VOL_DOWN_BUTTON[VOL_DOWN_BUTTON_SIZE] = {0b11111110, 0b11111111, 0
+ 
+ enum SystemState { SystemOff, SystemBoot, SystemOn, SystemShutdownWait, SystemShutdown };
+ enum ShutdownPhase { contactOff, lockInactive, lockActive };
++enum PredictState { Idle, ContactRecent, ContactNotRecent, Starting };
+ 
+ #define ChangeState(x) do { state = x; stateTimer = 0; } while (0)
++#define ChangePredictState(x) do { predictState = x; predictStateTimer = 0; } while (0)
+ #define testbit(var, bit)  ((var) & (1 << (bit)))
+ 
+ /* Timing */
+@@ -64,10 +66,15 @@ uint8_t irSendMessageIndex = 0;
+ /* TX */
+ uint16_t txIndex = 0;
+ 
+-/* State Machine */
++/* State Machines */
+ uint8_t state = SystemOff;
+ uint16_t stateTimer = 0;
+-uint8_t shutdownPhase = contactOff;
+ uint16_t noKnippers = 0;
++uint8_t shutdownPhase = contactOff;
++
++uint8_t predictState = Idle;
++uint16_t predictStateTimer = 0;
++uint16_t contactOffCounter = 0;
++bool predictiveStart = false;
+ 
+ #endif	/* GLOBALS_H */
+\ No newline at end of file
+diff --git a/RadioController.X/hardware.h b/RadioController.X/hardware.h
+index 2ff2c3a..2bcd064 100644
+--- a/RadioController.X/hardware.h
++++ b/RadioController.X/hardware.h
+@@ -23,13 +23,23 @@
+ 
+ #define RELAIS1 LATB0
+ #define RELAIS2 LATD7
++#define RELAIS3 ERROR // R3 switches accu/bat
++#define RELAIS4 ERROR // R4 switches accu/nothing
++#define R3ACCU = 0
++#define R3BAT = 1
++#define R4ACCU = 0
++#define R4OFF = 1
+ 
+ /* Input Names */
+ #define TSOP RD1
+ 
+-#define Contact DIGITAL1
+-#define Knipper DIGITAL3
+-#define Lock DIGITAL5
++#define Accessory !(DIGITAL1)
++#define Knipper !(DIGITAL3)
++#define Lock (!(DIGITAL5) && !Contact)
++#define Contact !(ERROR)
++#define Start !(ERROR)
++#define Accu !(ERROR)
++#define Pump !(ERROR)
+ 
+ /* Output Names */
+ #define CCP1 RC2
+@@ -41,7 +51,7 @@
+ #define IR_PWM LATC2
+ #define IR_EN LATC1
+ 
+-#define ContactRelais RELAIS1
++#define AccessoryRelais RELAIS1
+ 
+ 
+ #endif	/* HARDWARE_H */
+\ No newline at end of file
+diff --git a/RadioController.X/user.c b/RadioController.X/user.c
+index bc67213..d39569a 100644
+--- a/RadioController.X/user.c
++++ b/RadioController.X/user.c
+@@ -102,6 +102,11 @@ bool checkTimer1()
+ 
+         checkAnalog();
+ 
++        ERROR // @rim fix jij goeie frequency voor deze shz
++        predictiveStartUpdate();
++        updatePowerRelais();
++        EINDE ERRoR
++        
+         time25Hz++;
+         if (time25Hz == 2) {
+             time25Hz = 0;
+@@ -123,14 +128,14 @@ void checkStateMachine()
+         case SystemOff:
+             LED_RED = 1;
+             LED_GREEN = 1;
+-            ContactRelais = 0;
++            AccessoryRelais = 0;
+             
+-            // when contact is enabled, always go to boot state
+-            if (!Contact)
++            // when accessory is enabled, always go to boot state
++            if (Accessory)
+                 ChangeState(SystemBoot);
+ 
+             // when unlocking the doors, if accompanied by a knipper, also boot
+-            else if (lastKnipperRecent() && Lock)
++            else if (lastKnipperRecent() && !Lock)
+                 ChangeState(SystemBoot);
+ 
+             break;
+@@ -138,7 +143,7 @@ void checkStateMachine()
+         case SystemBoot:
+             LED_RED = 1;
+             LED_GREEN = 0;
+-            ContactRelais = 1;
++            AccessoryRelais = 1;
+ 
+             // @ time == 39: tx PWR_BUTTON_MSG
+             // @ time in 240-239: tx VOL_UP_BUTTON_MSG
+@@ -151,7 +156,7 @@ void checkStateMachine()
+ 
+             // if lock is activated (can only be measured when contact is off)
+             // also check this was due to a knipper and not due to cars' internal timeout/relock
+-            if (!Lock && Contact && lastKnipperRecent()) {
++            if (Lock && lastKnipperRecent()) {
+ 
+                 // if we haven't been in this state for some time, we may not need
+                 // to close the screen or lower the volume
+@@ -183,11 +188,11 @@ void checkStateMachine()
+ 
+                 // at this point we have fully started, opened screen and raised volume
+ 
+-                else if (!Knipper) {
++                else if (Knipper) {
+                     stateTimer = IDX_VOLUP_BUTTON_TX_END + 1;
+                     // this basically postpones the timeout event
+                 }
+-                else if (!Contact)
++                else if (Accessory)
+                     ChangeState(SystemOn);
+                 else if (stateTimer > IDX_TIMEOUT)
+                     ChangeState(SystemShutdown);
+@@ -197,9 +202,9 @@ void checkStateMachine()
+         case SystemOn:
+             LED_RED = 0;
+             LED_GREEN = 0;
+-            ContactRelais = 1;
++            AccessoryRelais = 1;
+ 
+-            if (Contact) {
++            if (!Accessory) {
+                 shutdownPhase = contactOff;
+                 ChangeState(SystemShutdownWait);
+             }
+@@ -208,27 +213,25 @@ void checkStateMachine()
+         case SystemShutdownWait:
+             LED_RED = 0;
+             LED_GREEN = 1;
+-            ContactRelais = 1;
++            AccessoryRelais = 1;
+ 
+             switch (shutdownPhase) {
+-                // shutdownPhase is initially always contactOff
++                // shutdownPhase is initially always accessoryOff
+                 case contactOff:
+                     // Lock signal was active while contact was on, but
+                     // quickly deactivates after contactOff
+-                    if (Lock)
++                    if (!Lock)
+                         shutdownPhase = lockInactive;
+                     break;
+ 
+                 case lockInactive:
+                     // after manually activating the lock the car is actually locked
+-                    if (!Lock && Contact && lastKnipperRecent())
++                    if (Lock && lastKnipperRecent())
+                         shutdownPhase = lockActive;
+                     break;
+             }
+ 
+-            // note that the contactOn signal would also activate the Lock signal,
+-            // so this check must be done before deciding whether to go to SystemShutdown
+-            if (!Contact)
++            if (Accessory)
+                 ChangeState(SystemOn);
+             else if (stateTimer > 1440 || shutdownPhase == lockActive)
+                 ChangeState(SystemShutdown);
+@@ -238,7 +241,7 @@ void checkStateMachine()
+         case SystemShutdown:
+             LED_RED = 0;
+             LED_GREEN = 1;
+-            ContactRelais = 1;
++            AccessoryRelais = 1;
+ 
+             const int IDX_PWR_BUTTON_TX = 52;
+             const int IDX_PWR_BUTTON_TX_END = 90;
+@@ -246,12 +249,12 @@ void checkStateMachine()
+             const int IDX_POWEROFF_RELAIS = 140;
+ 
+             // @ t in 0-50: tx VOL_DOWN_BUTTON_MSG
+-            //     contactOn/Lock/knipper -> ChangeState(SystemOn)
++            //     accessoryOn/Lock/knipper -> ChangeState(SystemOn)
+             // @ t = 55-56, tx PWR/REP button for full-shutdown of radio
+             // @ t = 110, goto SystemOff
+ 
+-            if (!Contact || (Lock && lastKnipperRecent())) {
+-                // if we've so far only turned volume down:
++            if (Accessory || (!Lock && lastKnipperRecent())) {
++                // unlock when we've so far only turned volume down:
+                 if (stateTimer <= IDX_VOL_DOWN_END)
+                     ChangeState(SystemOn); // user will have to manually up the volume himself
+                 // if we're currently transmitting the poweroff command, let this finish,
+@@ -282,7 +285,7 @@ void checkStateMachine()
+             break;
+     }
+ 
+-    if (!Knipper)
++    if (Knipper)
+         noKnippers = 0;
+     else if (noKnippers < 65535)
+         noKnippers++;
+@@ -290,4 +293,65 @@ void checkStateMachine()
+     if (stateTimer < 65535)
+         stateTimer++;
+ 
++}
++
++bool predictiveStartUpdate() {
++    // in this function the readings of contactOff are delayed
++    // because the contact reading is inaccurate during starting
++
++	const int CONTACTOFF_DELAY = ERROR; // todo, hangt denk af van call frequency
++	const int RECENTNESS_DELAY = ERROR; // todo, hangt denk af van call frequency
++
++    switch (predictState) {
++        case Idle:
++            if (Contact)
++                ChangePredictState(ContactRecent);
++            break;
++
++        case ContactRecent:
++        case ContactNotRecent: // hack but it's fine
++            if (Start)
++                ChangePredictState(Starting);
++            else if (contactOffCounter > RECENTNESS_DELAY)
++                ChangePredictState(Idle);
++            else if (predictStateTimer > 1000)
++                ChangePredictState(ContactNotRecent);
++            break;
++
++        case Starting:
++            if (Contact && !Start)
++                ChangePredictState(ContactNotRecent);
++            break;
++    }
++
++    predictiveStart = predictState == ContactRecent;
++
++    if (predictStateTimer < 65535)
++        predictStateTimer++;
++
++    // delay contact counter
++    if (Contact) contactOffCounter = 0;
++    else if (contactOffCounter < 65535) contactOffCounter++;
++}
++
++void updatePowerRelais() {    
++    // RELAIS3 ==> supply to the radio
++    // RELAIS4 ==> supply to the battery
++
++    if (Start || predictiveStart) {
++        // starting
++        RELAIS3 = R3BAT;
++        RELAIS4 = R4OFF;
++    }
++    else if (Pump && Contact) {
++        // running
++        RELAIS3 = R3BAT;
++        RELAIS4 = R4ACCU;
++    }
++    else {
++        // not starting, not running, possibly radio even turned off
++        RELAIS3 = R3ACCU;
++        RELAIS4 = R4OFF;
++    }
++
+ }
+\ No newline at end of file
