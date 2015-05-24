@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project-private xmlns="http://www.netbeans.org/ns/project-private/1">
+<?xml version="1.0" encoding="UTF-8"?><project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/1">
         <file>
             <url>hardware.h</url>
@@ -7,12 +6,7 @@
         </file>
     </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/1">
-        <file>file:/C:/Users/Rimco/Documents/Code/PIC/PIC%20C/Radio%20Controller.X/configuration_bits.c</file>
-        <file>file:/C:/Users/Rimco/Documents/Code/PIC/PIC%20C/Radio%20Controller.X/main.c</file>
-        <file>file:/C:/Users/Rimco/Documents/Code/PIC/PIC%20C/Radio%20Controller.X/user.c</file>
-        <file>file:/C:/Users/Rimco/Documents/Code/PIC/PIC%20C/Radio%20Controller.X/globals.h</file>
-        <file>file:/C:/Users/Rimco/Documents/Code/PIC/PIC%20C/Radio%20Controller.X/hardware.h</file>
-        <file>file:/C:/Users/Rimco/Documents/Code/PIC/PIC%20C/Radio%20Controller.X/user.h</file>
-        <file>file:/C:/Users/Rimco/Documents/Code/PIC/PIC%20C/Radio%20Controller.X/interrupts.c</file>
+        <file>file:/C:/Users/frank/Desktop/rc/Radio%20Controller.X/user.c</file>
+        <file>file:/C:/Users/frank/Desktop/rc/Radio%20Controller.X/hardware.h</file>
     </open-files>
 </project-private>

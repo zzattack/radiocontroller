@@ -1,10 +1,11 @@
-_initPIC: CODE, 1286 0 90
-_checkStateMachine: CODE, 662 0 472
-_main: CODE, 1612 0 4294966970
-_updatePowerRelais: CODE, 1570 0 42
-_predictiveStartUpdate: CODE, 1134 0 152
-_isr: CODE, 8 0 654
-_lastKnipperRecent: CODE, 1626 0 14
-_checkAnalog: CODE, 1376 0 78
-_checkTimer1: CODE, 1528 0 42
-Total: 1218
+_initPIC: CODE, 2796 0 102
+_checkStateMachine: CODE, 28 0 1188
+_main: CODE, 3138 0 20
+_updatePowerRelais: CODE, 2972 0 74
+_predictiveStartUpdate: CODE, 2042 0 364
+_isr: CODE, 8 0 2034
+_lastKnipperRecent: CODE, 3114 0 24
+_checkAnalog: CODE, 2658 0 138
+_checkTimer1: CODE, 3046 0 68
+_lockFix: CODE, 2406 0 252
+Total: 4264
