@@ -3,187 +3,194 @@
 /******************************************************************************/
 
 #include "buttonchecker.h"
+#include <xc.h>
 
-#if defined(NORMAL_BUTTONS) || defined(MATRIX_BUTTONS)
-void initButtons()
-{
-#ifdef NORMAL_BUTTONS
-    for (int i = 0; i < BUTTON_COUNT; i++) {
-#endif
-#ifdef MATRIX_BUTTONS
-    for (int i = 0; i < BUTTON_ROW_COUNT*BUTTON_COL_COUNT; i++) {
-#endif
-
-        buttonState[i].state = 1;
-        buttonState[i].upTime = 255;
-        buttonState[i].down = false;
-        
-    }
-}
-
-uint8_t checkButtons()
-{
-    bool result = 0;
-    bool button[BUTTON_COUNT];
-
-#ifdef NORMAL_BUTTONS
-
+void bcInit() {
+    
 #if BUTTON_COUNT >= 1
-    button[0] = BUTTON_0;
+    bcState[0].debouncedState = BUTTON_0;
 #endif
 #if BUTTON_COUNT >= 2
-    button[1] = BUTTON_1;
+    bcState[1].debouncedState = BUTTON_1;
 #endif
 #if BUTTON_COUNT >= 3
-    button[2] = BUTTON_2;
+    bcState[2].debouncedState = BUTTON_2;
 #endif
 #if BUTTON_COUNT >= 4
-    button[3] = BUTTON_3;
+    bcState[3].debouncedState = BUTTON_3;
 #endif
 #if BUTTON_COUNT >= 5
-    button[4] = BUTTON_4;
+    bcState[4].debouncedState = BUTTON_4;
 #endif
 #if BUTTON_COUNT >= 6
-    button[5] = BUTTON_5;
+    bcState[5].debouncedState = BUTTON_5;
 #endif
 #if BUTTON_COUNT >= 7
-    button[6] = BUTTON_6;
+    bcState[6].debouncedState = BUTTON_6;
 #endif
 #if BUTTON_COUNT >= 8
-    button[7] = BUTTON_7;
+    bcState[7].debouncedState = BUTTON_7;
 #endif
 #if BUTTON_COUNT >= 9
-    button[8] = BUTTON_8;
+    bcState[8].debouncedState = BUTTON_8;
 #endif
 #if BUTTON_COUNT >= 10
-    button[9] = BUTTON_9;
+    bcState[9].debouncedState = BUTTON_9;
 #endif
+#if BUTTON_COUNT >= 11
+    bcState[10].debouncedState = BUTTON_10;
 #endif
-
-#ifdef MATRIX_BUTTONS
-    for (int row = 0; row < BUTTON_ROW_COUNT; row++) {
-
-        switch(row) {
-#if BUTTON_ROW_COUNT >= 1
-            case 0:
-                BUTTON_TRIS_ROW0 = BUTTON_TRISV_ROW0;
-                BUTTON_ROW_0 = 0;
-                break;
+#if BUTTON_COUNT >= 12
+    bcState[11].debouncedState = BUTTON_11;
 #endif
-#if BUTTON_ROW_COUNT >= 2
-            case 1:
-                BUTTON_TRIS_ROW1 = BUTTON_TRISV_ROW1;
-                BUTTON_ROW_1 = 0;
-                break;
+#if BUTTON_COUNT >= 13
+    bcState[12].debouncedState = BUTTON_12;
 #endif
-#if BUTTON_ROW_COUNT >= 3
-            case 2:
-                BUTTON_TRIS_ROW2 = BUTTON_TRISV_ROW2;
-                BUTTON_ROW_2 = 0;
-                break;
+#if BUTTON_COUNT >= 14
+    bcState[13].debouncedState = BUTTON_13;
 #endif
-#if BUTTON_ROW_COUNT >= 4
-            case 3:
-                BUTTON_TRIS_ROW3 = BUTTON_TRISV_ROW3;
-                BUTTON_ROW_3 = 0;
-                break;
+#if BUTTON_COUNT >= 15
+    bcState[14].debouncedState = BUTTON_14;
 #endif
-#if BUTTON_ROW_COUNT >= 5
-            case 4:
-                BUTTON_TRIS_ROW4 = BUTTON_TRISV_ROW4;
-                BUTTON_ROW_4 = 0;
-                break;
+#if BUTTON_COUNT >= 16
+    bcState[15].debouncedState = BUTTON_15;
 #endif
-        }
-
-#if BUTTON_COL_COUNT >= 1
-        button[row*BUTTON_COL_COUNT+0] = BUTTON_COL_0;
+#if BUTTON_COUNT >= 17
+    bcState[16].debouncedState = BUTTON_16;
 #endif
-#if BUTTON_COL_COUNT >= 2
-        button[row*BUTTON_COL_COUNT+1] = BUTTON_COL_1;
+#if BUTTON_COUNT >= 18
+    bcState[17].debouncedState = BUTTON_17;
 #endif
-#if BUTTON_COL_COUNT >= 3
-        button[row*BUTTON_COL_COUNT+2] = BUTTON_COL_2;
+#if BUTTON_COUNT >= 19
+    bcState[18].debouncedState = BUTTON_18;
 #endif
-#if BUTTON_COL_COUNT >= 4
-        button[row*BUTTON_COL_COUNT+3] = BUTTON_COL_3;
+#if BUTTON_COUNT >= 20
+    bcState[19].debouncedState = BUTTON_19;
 #endif
-#if BUTTON_COL_COUNT >= 5
-        button[row*BUTTON_COL_COUNT+4] = BUTTON_COL_4;
-#endif
-#endif
-
-#ifdef NORMAL_BUTTONS
-        for (int i = 0; i < BUTTON_COUNT; i++) {
-#endif
-#ifdef MATRIX_BUTTONS
-        for (int col = 0; col < BUTTON_COL_COUNT; col++) {
-            uint8_t i = row*BUTTON_COL_COUNT+col;
-#endif
-
-            // Button release
-            if (button[i] == 1 && buttonState[i].state == 0 && buttonState[i].downTime >= 5) {
-                buttonState[i].upTime = 0;
-            }
-
-            // Button press
-            if (button[i] == 0 && buttonState[i].state == 1 && buttonState[i].upTime >= 5) {
-# ifdef LONG_BUTTON_TIME
-                buttonState[i].totalDownTime = 0;
-# endif
-                buttonState[i].downTime = 0;
-                buttonState[i].repeat = 0;
-            }
-
-            // Button pressed
-            if (button[i] == 0 && buttonState[i].downTime == 5 && buttonState[i].upTime >= 5) {
-                buttonState[i].pressed = true;
-                buttonState[i].down = true;
-                if (buttonState[i].repeat) {
-                    setbit(result, 1);
-                } else {
-                    buttonState[i].firstpressed = true;
-                    setbit(result, 0);
-                }
-            }
-
-            // Button released
-            if (button[i] == 1 && buttonState[i].upTime == 5 && buttonState[i].downTime >= 5) {
-                buttonState[i].released = true;
-                buttonState[i].down = false;
-                setbit(result, 2);
-            }
-
-            buttonState[i].state = button[i];
-
-#ifdef LONG_BUTTON_TIME
-            if (!buttonState[i].state && buttonState[i].totalDownTime < 65535) {
-                buttonState[i].totalDownTime++;
-                if (buttonState[i].totalDownTime == LONG_BUTTON_TIME) {
-                    buttonState[i].longpressed = true;
-                    setbit(result, 3);
-                }
-            }
-#endif
-
-            if (!buttonState[i].state)
-                buttonState[i].downTime++;
-            if (buttonState[i].downTime == (BUTTON_TIMER_HZ/2)) {
-                buttonState[i].downTime = (BUTTON_TIMER_HZ/4);
-                buttonState[i].repeat = 1;
-            }
-
-#ifdef LONG_TIMES
-            if (buttonState[i].state && buttonState[i].upTime < 65535)
-#else
-            if (buttonState[i].state && buttonState[i].upTime < 255)
-#endif
-                buttonState[i].upTime++;
-        }
-
-#ifdef MATRIX_BUTTONS
+    
+    for (uint8_t i = 0; i < BUTTON_COUNT; i++) {
+        bcState[i].count = BC_PRESS_MSEC;
+        bcState[i].repeatCount = BC_REPEAT_MSEC;
+        bcState[i].tick = 0;
+        bcState[i].repeat = 0;
     }
+}
+
+bool bcCheck() {
+    bool result = false;
+    bool raw_button[BUTTON_COUNT];
+    
+#if BUTTON_COUNT >= 1
+    raw_button[0] = BUTTON_0;
 #endif
+#if BUTTON_COUNT >= 2
+    raw_button[1] = BUTTON_1;
+#endif
+#if BUTTON_COUNT >= 3
+    raw_button[2] = BUTTON_2;
+#endif
+#if BUTTON_COUNT >= 4
+    raw_button[3] = BUTTON_3;
+#endif
+#if BUTTON_COUNT >= 5
+    raw_button[4] = BUTTON_4;
+#endif
+#if BUTTON_COUNT >= 6
+    raw_button[5] = BUTTON_5;
+#endif
+#if BUTTON_COUNT >= 7
+    raw_button[6] = BUTTON_6;
+#endif
+#if BUTTON_COUNT >= 8
+    raw_button[7] = BUTTON_7;
+#endif
+#if BUTTON_COUNT >= 9
+    raw_button[8] = BUTTON_8;
+#endif
+#if BUTTON_COUNT >= 10
+    raw_button[9] = BUTTON_9;
+#endif
+#if BUTTON_COUNT >= 11
+    raw_button[10] = BUTTON_10;
+#endif
+#if BUTTON_COUNT >= 12
+    raw_button[11] = BUTTON_11;
+#endif
+#if BUTTON_COUNT >= 13
+    raw_button[12] = BUTTON_12;
+#endif
+#if BUTTON_COUNT >= 14
+    raw_button[13] = BUTTON_13;
+#endif
+#if BUTTON_COUNT >= 15
+    raw_button[14] = BUTTON_14;
+#endif
+#if BUTTON_COUNT >= 16
+    raw_button[15] = BUTTON_15;
+#endif
+#if BUTTON_COUNT >= 17
+    raw_button[16] = BUTTON_16;
+#endif
+#if BUTTON_COUNT >= 18
+    raw_button[17] = BUTTON_17;
+#endif
+#if BUTTON_COUNT >= 19
+    raw_button[18] = BUTTON_18;
+#endif
+#if BUTTON_COUNT >= 20
+    raw_button[19] = BUTTON_19;
+#endif
+    
+    for (int i = 0; i < BUTTON_COUNT; i++) {
+        // no change
+        if (raw_button[i] == bcState[i].debouncedState) {
+            // (re)set the timer which allows a change from the current state
+
+            if (raw_button[i]) {
+                bcState[i].count = BC_RELEASE_MSEC;            
+            
+                // update repeat counter while pressed
+                if (--bcState[i].repeatCount == 0 && BC_REPEAT_MSEC != 0) {
+                    // dbgs("repeat @ "); dbgsval(i); dbgs("\n");
+                    bcState[i].repeatCount = BC_REPEAT_MSEC;
+                    bcState[i].repeat = 1;
+                    result = true;
+                }
+            }
+            
+            else 
+                bcState[i].count = BC_PRESS_MSEC;
+        }
+        else {
+            // raw press state has changed, wait for new state to stabilize
+            if (--bcState[i].count == 0) {            
+                bcState[i].debouncedState = raw_button[i];
+                bcState[i].tick = 1;
+                bcState[i].repeatCount = BC_REPEAT_MSEC;
+                bcState[i].repeat = 0;
+                result = true;
+                
+                // and reset the timer
+                if (bcState[i].debouncedState) bcState[i].count = BC_RELEASE_MSEC;
+                else bcState[i].count = BC_PRESS_MSEC;
+            }
+        }
+    }
+    
     return result;
 }
-#endif
+
+bool bcTick(uint8_t i) {
+    bool ret = bcState[i].tick;
+    bcState[i].tick = 0;
+    return ret;
+}
+bool bcRepeat(uint8_t i) {
+    bool ret = bcState[i].repeat;
+    bcState[i].repeat = 0;
+    return ret;
+}
+
+bool bcPressed(uint8_t i) {
+    return bcState[i].debouncedState;
+}

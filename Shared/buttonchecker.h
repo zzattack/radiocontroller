@@ -1,88 +1,53 @@
+/*
+ * Usage:
+ * 
+ *  1) include buttonchecker.h and buttonchecker.c in project
+ *  2) call bcInit() during program initialization
+ *  3) in hardware.h, define BUTTON_COUNT
+ *       #define BUTTON_COUNT 2
+ *  4) in hardware.h, define buttons
+ *        #define BUTTON_0 PORTAbits.RA4
+ *        #define BUTTON_1 PORTCbits.RC2
+ *  5) in main.c, call bcCheck() at 10Hz from tickTimer10Hz()
+ *  6) if bcCheck() returned true, check individual button changes with bcTick(i),
+ *     and check whether pressed/unpressed with bcPressed(i)
+ *  
+*/
+
 #ifndef BUTTONCHECKER_H
-#define	BUTTONCHECKER_H
+#define BUTTONCHECKER_H
 
-/******************************************************************************/
-/* Files to Include                                                           */
-/******************************************************************************/
-
-#include "basic.h"          /* For the basic definitions */
 #include "hardware.h"       /* For the port mappings */
+#include <stdbool.h>
+#include <stdint.h>
 
-/******************************************************************************/
-/* Public variables                                                           */
-/******************************************************************************/
+#ifndef BC_PRESS_MSEC
+#define BC_PRESS_MSEC 4 // register press after 40 msec
+#endif
+#ifndef BC_RELEASE_MSEC
+#define BC_RELEASE_MSEC 6 // register release after 60 msec
+#endif
+#ifndef BC_REPEAT_MSEC
+#define BC_REPEAT_MSEC 1200 // register repeat after 1200 msec
+#endif
 
-#ifdef LONG_BUTTON_TIME
 typedef struct {
-    uint16_t totalDownTime;
-#ifdef LONG_TIMES
-    uint16_t downTime;
-    uint16_t upTime;
-#else
-    uint8_t downTime;
-    uint8_t upTime;
-#endif
-    uint8_t state  : 1;
-    uint8_t down : 1;
+    uint8_t count;
+    uint8_t repeatCount;
+    uint8_t debouncedState : 1;
+    uint8_t tick : 1;
     uint8_t repeat : 1;
-    uint8_t pressed : 1;
-    uint8_t firstpressed : 1;
-    uint8_t released : 1;
-    uint8_t longpressed : 1;
 } ButtonState;
-#else
-typedef struct {
-#ifdef LONG_TIMES
-    uint16_t downTime;
-    uint16_t upTime;
-#else
-    uint8_t downTime;
-    uint8_t upTime;
-#endif
-    uint8_t state  : 1;
-    uint8_t down : 1;
-    uint8_t repeat : 1;
-    uint8_t pressed : 1;
-    uint8_t firstpressed : 1;
-    uint8_t released : 1;
-    uint8_t longpressed : 1;
-} ButtonState;
-#endif
 
-#ifndef BUTTON_BANK
-#define BUTTON_BANK
-#endif
-
-#ifndef BUTTON_TIMER_HZ
-#define BUTTON_TIMER_HZ 100
-#endif
-
-#if defined(NORMAL_BUTTONS) && defined(MATRIX_BUTTONS)
-#error Cannot use both button modes simultaneously!
-#endif
-
-#ifdef MATRIX_BUTTONS
-# define BUTTON_COUNT (BUTTON_COL_COUNT*BUTTON_ROW_COUNT)
-#endif
-
-#if defined(NORMAL_BUTTONS) || defined(MATRIX_BUTTONS)
-ButtonState buttonState[BUTTON_COUNT];
-#endif
+ButtonState bcState[BUTTON_COUNT];
 
 /******************************************************************************/
 /* Function Prototypes                                                        */
 /******************************************************************************/
-
-#if defined(NORMAL_BUTTONS) || defined(MATRIX_BUTTONS)
-void initButtons();
-// Status codes:
-// 0 = No change
-// bit 0 = new press (not repeated)
-// bit 1 = repeated press
-// bit 2 = release
-// bit 3 = long press
-uint8_t checkButtons();        /* Check if a button is pressen (should be 100Hz) */
-#endif
+void bcInit();
+bool bcCheck(); // Check if a button is pressed/unpressed call @ 1000Hz
+bool bcTick(uint8_t i);
+bool bcRepeat(uint8_t i);
+bool bcPressed(uint8_t i);
 
 #endif	/* BUTTONCHECKER_H */
-
