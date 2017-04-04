@@ -17,7 +17,7 @@
 
 // CONFIG2L
 #pragma config PWRT = ON        // Power-up Timer Enable bit (PWRT enabled)
-#pragma config BOR = ON         // Brown-out Reset Enable bits (Brown-out Reset enabled in hardware only (SBOREN is disabled))
+#pragma config BOR = OFF        // Brown-out Reset Enable bits (Brown-out Reset enabled in hardware only (SBOREN is disabled))
 #pragma config BORV = 1         // Brown-out Reset Voltage bits (Setting 2 4.33V)
 #pragma config VREGEN = OFF     // USB Voltage Regulator Enable bit (USB voltage regulator disabled)
 
@@ -29,7 +29,7 @@
 #pragma config CCP2MX = ON      // CCP2 MUX bit (CCP2 input/output is multiplexed with RC1)
 #pragma config PBADEN = OFF     // PORTB A/D Enable bit (PORTB<4:0> pins are configured as digital I/O on Reset)
 #pragma config LPT1OSC = OFF    // Low-Power Timer 1 Oscillator Enable bit (Timer1 configured for higher power operation)
-#pragma config MCLRE = ON       // MCLR Pin Enable bit (MCLR pin enabled; RE3 input pin disabled)
+#pragma config MCLRE = OFF      // MCLR Pin Enable bit (MCLR pin disabled; RE3 input pin enabled)
 
 // CONFIG4L
 #pragma config STVREN = ON      // Stack Full/Underflow Reset Enable bit (Stack full/underflow will cause Reset)

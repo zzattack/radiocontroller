@@ -63,17 +63,43 @@ bool LockRealPrev = 0;
 void main() {
     /* Initialize I/O and Peripherals for application */
     initPIC();
+    U1Init(115200, false, true);
+    bcInit();
+    
+    RCONbits.IPEN = 1; // priority levels
+    INTCONbits.GIEH = 1;
+    INTCONbits.GIEL = 1;
+    
     dbgs("Radiocontroller initialized\n");
+    dbgs("Last reset cause: \n");
+    if (!RCONbits.RI) {
+        dbgs("Reset instruction\n");
+        RCONbits.RI = 1;
+    }
+    if (!RCONbits.TO) {
+        dbgs("watchdog\n");
+    }
+    if (!RCONbits.PD) {
+        dbgs("SLEEP instruction\n");
+    }
+    if (!RCONbits.POR) {
+        dbgs("Power on reset\n");
+        RCONbits.POR = 1;
+    }
+    if (RCONbits.BOR) {
+        dbgs("Brown-out reset\n");
+        RCONbits.BOR = 1;
+    }
     
     LED_GREEN = 1;
     LED_RED = 1;
     while(1) {
+        ClrWdt();
+        
         if (EasyTimerTick) {
             EasyTimerTick--;
             tick1000HzInternal();
         }
-                
-        checkAnalog();
         predictiveStartUpdate();
         updatePowerRelais();
         lockFix();
@@ -103,9 +129,6 @@ void initPIC() {
     T2CON	 = 0b01100101;
     TMR2IE   = 1;
     TMR2IP   = 1;
-
-    U1Init(115200, false, true);    
-    ei();
 }
 
 void ChangeSysState(SystemState s, const char* reason) {
@@ -201,12 +224,12 @@ void checkStateMachine() {
             const int IDX_TIMEOUT = 18000; // 3mins
             Brake = stateTimer > 200 ? 1 : 0; // bogus brake signal, just usually GND for pioneer
 
-            if (Lock) // lock while booting, just shut off
+            if (Accessory) // full on
+                ChangeSysState(SystemOn, "accessory on");
+            else if (Lock && lastBlinkRecent()) // lock while booting, just shut off
                 ChangeSysState(SystemShutdown, "lock while booting");            
             else if (Blink) // blink while booting, postpone timeout
                 stateTimer = 0;
-            else if (Accessory) // full on
-                ChangeSysState(SystemOn, "accessory on");
             else if (stateTimer > IDX_TIMEOUT) // timeout, shut off
                 ChangeSysState(SystemShutdown, "no accessory before 3min timeout");
             break;
@@ -275,18 +298,20 @@ void predictiveStartUpdate() {
 
     switch (predictState) {
         case Idle:
-            if (Contact)
+            if (Contact) {
                 ChangePredictState(ContactRecent, "contact on");
+                contactOffCounter = 0;
+            }
             break;
 
         case ContactRecent:
         case ContactNotRecent: // hack but it's fine
             if (Start)
                 ChangePredictState(Starting, "start on");
-            else if (contactOffCounter > CONTACTOFF_DELAY)
+            else if (!Contact && contactOffCounter > CONTACTOFF_DELAY)
                 // contact now definitely off
                 ChangePredictState(Idle, "contactOffCounter > CONTACTOFF_DELAY");
-            else if (predictTimer > RECENTNESS_DELAY)
+            else if (predictTimer > RECENTNESS_DELAY && predictState == ContactRecent)
                 ChangePredictState(ContactNotRecent, "predictTimer > RECENTNESS_DELAY");
             break;
 
@@ -364,20 +389,45 @@ void lockFix() {
 }
 
 
-void interrupt isr() {
-    EasyTimerTick++;
+void interrupt high_priority isr() {
+    uartsIsr();
+    if (TMR2IF) {
+        TMR2IF = 0;
+        EasyTimerTick++;
+    }
+}
+void interrupt low_priority isr_low() {
+    dbgs("low priority interrupt, should never fire!\n");
 }
 
 extern void tickTimer1000Hz() {
     if (bcCheck()) {
-        if (bcPressed(5) && bcTick(5)) noBlink = 0;        
+        if (bcTick(0)) {
+            dbgs("[BTN] "); dbgs("accessory: "); dbgs(bcPressed(0) ? "on" : "off"); dbgs("\n");
+        }
+        if (bcTick(1)) {
+            dbgs("[BTN] "); dbgs("contact: "); dbgs(bcPressed(1) ? "on" : "off"); dbgs("\n");
+        }
+        if (bcTick(2)) {
+            dbgs("[BTN] "); dbgs("start: "); dbgs(bcPressed(2) ? "on" : "off"); dbgs("\n");
+        }
+        if (bcTick(3)) {
+            dbgs("[BTN] "); dbgs("pump: "); dbgs(bcPressed(3) ? "on" : "off"); dbgs("\n");
+        }
+        if (bcTick(4)) {
+            dbgs("[BTN] "); dbgs("lockreal: "); dbgs(bcPressed(4) ? "on" : "off"); dbgs("\n");
+        }
+        if (bcTick(5)) {
+            dbgs("[BTN] "); dbgs("blink: "); dbgs(bcPressed(5) ? "on" : "off"); dbgs("\n");
+        }        
+
+        if (bcPressed(5)) noBlink = 0;        
     }
 }
 extern void tickTimer100Hz() {
     if (stateTimer < 65535) stateTimer++;
     if (predictTimer < 65535) predictTimer++;
-    if (noBlink < 65535) noBlink++;
-    
+    if (noBlink < 65535) noBlink++;   
     
     // delay contact counter
     if (Contact) contactOffCounter = 0;
@@ -391,7 +441,7 @@ extern void tickTimer100Hz() {
     
 }
 extern void tickTimer10Hz() { 
-    
+    checkAnalog();
 }
 extern void tickTimer1Hz() {
     

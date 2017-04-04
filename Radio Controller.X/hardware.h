@@ -9,6 +9,7 @@
 
 #define UART_DISABLE_PORT2
 #define UART_DBG_PORT 1
+#define UART_DISABLE_INTERRUPTS
 
 #define _XTAL_FREQ 48000000
 
@@ -36,7 +37,7 @@
 #define BTNContact !(DIGITAL2)
 #define BTNBlink !(DIGITAL3)
 #define BTNStart !(DIGITAL4)
-#define BTNLockReal (!(DIGITAL5) && !Contact)
+#define BTNLockReal (!(DIGITAL5) && !BTNContact)
 extern uint8_t analog4Value;
 #define BTNPump (analog4Value > 127)
 
@@ -64,8 +65,8 @@ extern uint8_t analog4Value;
 #define BUTTON_5 BTNBlink
 #define Blink bcPressed(5)
 
-#define BUTTON_COUNT 5
-
+#define BUTTON_COUNT 6
+#define BC_REPEAT_MSEC 0 // no repeats
 
 
 #endif	/* HARDWARE_H */

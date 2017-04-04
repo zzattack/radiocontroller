@@ -1,16 +1,8 @@
-/*.hex
-/build
-/dist
-RadioController.X/funclist
-/RadioController.X/nbproject/private
-/RadioController.X/nbproject/*.properties
-/RadioController.X/nbproject/*.bash
-/RadioController.X/nbproject/*.mk
-/RadioController.X/nbproject/*.mk
-/RadioController.X/nbproject/*.mk
-/RadioController.X/nbproject/*.mk
-
-/RadioController.X/Makefile
-
-/RadioController.X/*.hex
-/RadioController.X/basic.h
+# mplab projects
+dist
+build
+Makefile-*
+Package-*
+private
+funclist
+disassembly
